@@ -6,24 +6,27 @@ interface QuizQuestionProps {
   question: Question;
   userAnswer: string | number | null;
   onAnswer: (answer: string | number) => void;
-  showFeedback?: boolean;
   questionNumber: number;
   totalQuestions: number;
   timeLeft: number;
   completeQuiz: ()=> void;
-  onNextQuestion:  React.Dispatch<React.SetStateAction<number>>
+  onNextQuestion:  React.Dispatch<React.SetStateAction<number>>,
+ score: number;
+  setScore: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function QuizQuestion({ 
   question, 
   userAnswer, 
   onAnswer, 
-  showFeedback,
   questionNumber,
   totalQuestions,
   timeLeft,
   completeQuiz,
-  onNextQuestion
+  onNextQuestion,
+  score,
+  setScore,
+
 }: QuizQuestionProps) {
   const [inputValue, setInputValue] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -31,11 +34,7 @@ export function QuizQuestion({
 
   const isCorrect = userAnswer !== null && userAnswer === question.correctAnswer;
 
-  // Helper hints for different question types
-  const hints = {
-    'multiple-choice': 'Read each option carefully and eliminate obviously wrong answers first.',
-    'integer': 'Take your time to calculate. You can use paper for complex calculations.'
-  };
+
 
   useEffect(() => {
     setShowResult(false);
@@ -45,11 +44,11 @@ export function QuizQuestion({
 
   const handleNextQuestion = () => {
     onAnswer(Number(inputValue));
-    console.log(question.correctAnswer, userAnswer);
+    if (Number(inputValue) === question.correctAnswer) {
+      setScore(prevScore => prevScore + 1);
+    }
     
     if (!userAnswer) return;
-    console.log(inputValue)
-    onAnswer(Number(inputValue));
     setShowResult(true);
     
     setTimeout(() => {
@@ -85,10 +84,13 @@ export function QuizQuestion({
             {showResult && (
               <div className="flex items-center gap-2">
                 {isCorrect ? (
-                  <div className="flex items-center gap-1 text-green-600 animate-bounce">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span className="text-sm font-medium">Correct!</span>
-                  </div>
+                    <>
+                    {/* {setScore(prevScore => prevScore + 1)} */}
+                    <div className="flex items-center gap-1 text-green-600 animate-bounce">
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span className="text-sm font-medium">Correct!</span>
+                    </div>
+                    </>
                 ) : (
                   <div className="flex items-center gap-1 text-red-600">
                     <XCircle className="w-5 h-5" />
@@ -99,22 +101,7 @@ export function QuizQuestion({
             )}
           </div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">{question.question}</h3>
-          
-          {/* Hint System */}
-          <div className="relative">
-            <button 
-              onClick={() => setShowHint(!showHint)}
-              className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
-            >
-              <HelpCircle className="w-4 h-4" />
-              Need a hint?
-            </button>
-            {showHint && (
-              <div className="absolute top-full mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800 shadow-lg max-w-md z-10">
-                {hints[question.type]}
-              </div>
-            )}
-          </div>
+                  
         </div>
         
         <div className="p-6 bg-gray-50">
@@ -123,7 +110,6 @@ export function QuizQuestion({
               {question.options?.map((option, index) => {
                 const letter = String.fromCharCode(65 + index);
                 const isSelected = userAnswer === letter;
-                console.log(isSelected, letter, userAnswer);
                 return (
                   <button
                     key={letter}

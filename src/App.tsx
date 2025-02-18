@@ -20,7 +20,7 @@ function App() {
   const [showingHistory, setShowingHistory] = useState(false);
   const [questionTimeLeft, setQuestionTimeLeft] = useState(SECONDS_PER_QUESTION);
   const [showTimeWarning, setShowTimeWarning] = useState(false);
-
+  const [totalScore, setTotalScore] = useState(0);
   useEffect(() => {
     loadAttempts();
   }, []);
@@ -45,7 +45,6 @@ function App() {
     if (!answers[currentQuestion]) {
       setAnswers(prev => ({ ...prev, [currentQuestion]: answer }));
       
-      // For multiple choice questions, move to next question after a brief delay
       const question = questions[currentQuestion];
       if (question.type === 'multiple-choice' && currentQuestion < questions.length - 1) {
         // setTimeout(() => {
@@ -79,6 +78,7 @@ function App() {
   }
 
   async function completeQuiz() {
+    console.log(attempts);
     const score = questions.reduce((acc, q) => {
       return acc + (answers[q.id] === q.correctAnswer ? 1 : 0);
     }, 0);
@@ -128,6 +128,7 @@ function App() {
       <div className="min-h-screen bg-gray-100 p-6">
         <QuizResults
           attempt={attempts[attempts.length - 1]}
+          totalScore = {totalScore}
           totalQuestions={questions.length}
           onRetry={startNewQuiz}
           onViewHistory={() => setShowingHistory(true)}
@@ -167,12 +168,13 @@ function App() {
           question={questions[currentQuestion]}
           userAnswer={answers[currentQuestion] || null}
           onAnswer={handleAnswer}
-          showFeedback={answers[currentQuestion] !== undefined}
           questionNumber={currentQuestion + 1}
           totalQuestions={questions.length}
           timeLeft={questionTimeLeft}
           onNextQuestion={setCurrentQuestion}
           completeQuiz={completeQuiz}
+          score={totalScore}
+          setScore={setTotalScore}
         />
 
         {showTimeWarning && (

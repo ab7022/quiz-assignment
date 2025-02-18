@@ -6,11 +6,12 @@ interface QuizResultsProps {
   attempt: QuizAttempt;
   totalQuestions: number;
   onRetry: () => void;
+  totalScore: number;
   onViewHistory: () => void;
 }
 
-export function QuizResults({ attempt, totalQuestions, onRetry, onViewHistory }: QuizResultsProps) {
-  const percentage = Math.round((attempt.score / totalQuestions) * 100);
+export function QuizResults({ attempt, totalQuestions, onRetry, onViewHistory ,totalScore}: QuizResultsProps) {
+  const percentage = Math.round((totalScore / totalQuestions) * 100);
   const minutes = Math.floor(attempt.timeSpent / 60);
   const seconds = attempt.timeSpent % 60;
   
@@ -25,25 +26,14 @@ export function QuizResults({ attempt, totalQuestions, onRetry, onViewHistory }:
           <p className="text-gray-600">Great job! Here's how you performed:</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 p-8">
+        <div className="grid grid-cols-1 gap-6 p-8">
           <div className="p-6 bg-blue-50 rounded-xl text-center">
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-100 flex items-center justify-center">
               <Trophy className="w-6 h-6 text-blue-600" />
             </div>
             <p className="text-gray-600 mb-1">Score</p>
             <p className="text-3xl font-bold text-blue-600">{percentage}%</p>
-            <p className="text-sm text-blue-600">({attempt.score}/{totalQuestions} correct)</p>
-          </div>
-          
-          <div className="p-6 bg-purple-50 rounded-xl text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-100 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-purple-600" />
-            </div>
-            <p className="text-gray-600 mb-1">Time Spent</p>
-            <p className="text-3xl font-bold text-purple-600">
-              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-            </p>
-            <p className="text-sm text-purple-600">minutes</p>
+            <p className="text-sm text-blue-600">({totalScore}/{totalQuestions} correct)</p>
           </div>
         </div>
 
